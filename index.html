@@ -3,56 +3,88 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>데이트 코스 추천 지도</title>
+  <title>우연히 내게오나봐~ 데이트 코스 추천</title>
 
   <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=ecaf8e9e8be5e5b6e158dfeb3b7372df&libraries=services&autoload=false"></script>
 
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
-    body { width: 100%; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+    /* 봄 느낌 핑크 테마 설정 */
+    :root {
+      --main-pink: #ffafbd;
+      --light-pink: #ffc3a0;
+      --soft-white: #fff5f6;
+      --point-rose: #ff6b81;
+    }
 
-    /* 헤더 및 탭 스타일 */
-    header { background: #ffcd00; padding: 15px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
-    .tab-container { display: flex; background: #fff; border-radius: 20px; padding: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .tab { padding: 8px 20px; cursor: pointer; border-radius: 15px; font-weight: bold; transition: 0.3s; color: #666; }
-    .tab.active { background: #333; color: #fff; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif; }
+    body { width: 100%; height: 100vh; overflow: hidden; display: flex; flex-direction: column; background-color: var(--soft-white); }
 
-    .container { display: flex; flex: 1; width: 100%; height: calc(100vh - 65px); }
+    /* 헤더 디자인 */
+    header { 
+      background: linear-gradient(135deg, var(--main-pink), var(--light-pink)); 
+      padding: 20px; 
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      z-index: 10;
+    }
+    header h1 { color: white; font-size: 22px; margin-bottom: 15px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
 
-    /* 사이드바 */
-    .sidebar { width: 350px; border-right: 1px solid #ddd; display: flex; flex-direction: column; background: #fff; }
-    .location-info { padding: 15px; background: #f9f9f9; border-bottom: 1px solid #eee; font-size: 14px; font-weight: bold; color: #333; }
+    /* 탭 디자인 */
+    .tab-container { display: flex; justify-content: center; gap: 10px; }
+    .tab { 
+      padding: 10px 25px; 
+      cursor: pointer; 
+      border-radius: 25px; 
+      font-weight: bold; 
+      background: white; 
+      color: var(--point-rose);
+      transition: all 0.3s ease;
+      border: 2px solid white;
+    }
+    .tab.active { background: var(--point-rose); color: white; border-color: var(--point-rose); }
+
+    .main-wrapper { display: flex; flex: 1; height: calc(100vh - 120px); }
+
+    /* 사이드바 디자인 */
+    .sidebar { width: 320px; background: white; border-right: 1px solid #ffe4e6; display: flex; flex-direction: column; }
+    #currentLocationText { padding: 15px; font-size: 14px; background: #fff0f3; color: var(--point-rose); font-weight: bold; text-align: center; }
     .result-list { flex: 1; overflow-y: auto; }
-    .place-item { padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; transition: 0.2s; }
-    .place-item:hover { background: #fff9e6; }
-    .place-name { font-weight: bold; color: #333; margin-bottom: 5px; font-size: 16px; }
-    .place-category { font-size: 12px; color: #888; }
-    .place-dist { font-size: 12px; color: #ff6b6b; margin-top: 5px; font-weight: bold; }
+    .place-item { padding: 15px; border-bottom: 1px solid #fff0f3; cursor: pointer; }
+    .place-item:hover { background: #fff9fa; }
+    .place-name { font-weight: bold; color: #444; font-size: 15px; }
+    .place-category { font-size: 12px; color: #999; margin-top: 3px; }
 
     /* 지도 */
-    .map-area { flex: 1; position: relative; }
+    .map-area { flex: 1; }
     #map { width: 100%; height: 100%; }
 
-    /* 초기 팝업 스타일 */
-    .modal { display: flex; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; }
-    .modal-content { background: #fff; width: 320px; padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-    .modal-content h3 { margin-bottom: 10px; color: #333; }
-    .modal-content input { width: 100%; padding: 12px; margin: 15px 0; border: 2px solid #ffcd00; border-radius: 10px; outline: none; font-size: 16px; }
-    .btn-start { background: #ffcd00; border: none; padding: 12px 30px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px; width: 100%; }
-    .btn-start:hover { background: #f5c400; }
+    /* 시작 팝업 디자인 */
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    .modal-content { background: white; padding: 40px; border-radius: 30px; text-align: center; border: 5px solid var(--main-pink); box-shadow: 0 15px 30px rgba(0,0,0,0.2); }
+    .modal-content h2 { color: var(--point-rose); margin-bottom: 10px; }
+    .modal-content input { width: 100%; padding: 15px; margin: 20px 0; border: 2px solid var(--main-pink); border-radius: 15px; outline: none; font-size: 16px; }
+    .btn-search { background: var(--point-rose); color: white; border: none; padding: 15px 40px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; }
+
+    /* 말풍선(인포윈도우) 핑크색 커스텀 */
+    .info-window { padding: 10px; font-size: 13px; text-align: center; border-radius: 10px; }
   </style>
 </head>
 <body>
 
 <header>
-  <div style="font-weight: 900; font-size: 20px; color: #333;">✨ DATE MAP</div>
+  <h1>🌸 우연히 내게오나봐~ 데이트 코스 추천</h1>
   <div class="tab-container">
-    <div class="tab active" id="tabFood" onclick="switchTab('food')">음식 코스</div>
-    <div class="tab" id="tabActivity" onclick="switchTab('activity')">체험 코스</div>
+    <div id="foodTab" class="tab active" onclick="showTab('food')">🍴 맛있는 코스</div>
+    <div id="activityTab" class="tab" onclick="showTab('activity')">🎡 즐거운 코스</div>
   </div>
-  <button style="padding: 5px 10px; border: 1px solid #333; background: none; border-radius: 5px; cursor: pointer; font-size: 12px;" onclick="location.reload()">다시 검색</button>
 </header>
 
-<div class="container">
+<div class="main-wrapper">
   <div class="sidebar">
-    <div class="location-info" id="currentLocation
+    <div id="currentLocationText">지역을 설정해주세요</div>
+    <div id="resultList" class="result-list"></div>
+  </div>
+  <div class="map-area">
+    <div id="map"></div>
+  </div>
+</div>
