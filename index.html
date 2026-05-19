@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- 사이트 제목 변경 -->
+  <!-- 사이트 제목 -->
   <title>우연히 내게오나봐~ 데이트 코스 추천 지도</title>
 
   <!-- 카카오맵 SDK -->
@@ -20,6 +20,7 @@
   />
 
   <style>
+
     * {
       margin: 0;
       padding: 0;
@@ -71,7 +72,7 @@
       backdrop-filter: blur(4px);
     }
 
-    /* 사이드바 */
+    /* 왼쪽 사이드바 */
     .sidebar {
       width: 38%;
       min-width: 340px;
@@ -83,7 +84,7 @@
       box-shadow: 4px 0 20px rgba(255, 182, 193, 0.2);
     }
 
-    /* 상단 */
+    /* 상단 검색 영역 */
     .search-box {
       padding: 24px;
       border-bottom: 1px solid #ffd4e2;
@@ -94,7 +95,7 @@
       );
     }
 
-    /* 타이틀 */
+    /* 메인 제목 */
     .main-title {
       font-size: 38px;
       font-family: "Nanum Pen Script", cursive;
@@ -104,6 +105,7 @@
       text-shadow: 0 2px 10px rgba(255,105,180,0.2);
     }
 
+    /* 서브 제목 */
     .sub-title {
       text-align: center;
       color: #c96a87;
@@ -111,7 +113,7 @@
       font-size: 14px;
     }
 
-    /* 검색 */
+    /* 검색창 */
     .search-form {
       display: flex;
       gap: 10px;
@@ -190,7 +192,7 @@
       padding: 15px;
     }
 
-    /* 카드 */
+    /* 장소 카드 */
     .place-item {
       padding: 18px;
       margin-bottom: 14px;
@@ -226,7 +228,7 @@
       color: #999;
     }
 
-    /* 지도 */
+    /* 지도 영역 */
     .map-area {
       flex: 1;
       position: relative;
@@ -247,16 +249,21 @@
       opacity: 0.9;
       z-index: 10;
       animation: floating 4s ease-in-out infinite;
-      filter: drop-shadow(0 10px 15px rgba(255,182,193,0.3));
+      filter: drop-shadow(
+        0 10px 15px rgba(255,182,193,0.3)
+      );
     }
 
     @keyframes floating {
+
       0% {
         transform: translateY(0px) rotate(0deg);
       }
+
       50% {
         transform: translateY(-8px) rotate(2deg);
       }
+
       100% {
         transform: translateY(0px) rotate(0deg);
       }
@@ -346,6 +353,7 @@
         width: 90px;
       }
     }
+
   </style>
 </head>
 
@@ -375,10 +383,10 @@
 
   </div>
 
-  <!-- 전체 -->
+  <!-- 전체 컨테이너 -->
   <div class="container">
 
-    <!-- 왼쪽 -->
+    <!-- 왼쪽 영역 -->
     <div class="sidebar">
 
       <div class="search-box">
@@ -421,14 +429,14 @@
             class="tab-button"
             id="activityTab"
           >
-            🎡 체험 코스
+            🎠 체험 코스
           </button>
 
         </div>
 
       </div>
 
-      <!-- 결과 -->
+      <!-- 결과 리스트 -->
       <div
         class="result-list"
         id="resultList"
@@ -439,7 +447,7 @@
     <!-- 지도 -->
     <div class="map-area">
 
-      <!-- 벚꽃 이미지 -->
+      <!-- 벚꽃 장식 -->
       <img
         class="flower-decoration"
         src="https://cdn-icons-png.flaticon.com/512/766/766720.png"
@@ -456,10 +464,10 @@
     // 지도 객체
     let map;
 
-    // 장소 검색 객체
+    // 장소 검색 서비스
     let placesService;
 
-    // 주소 검색 객체
+    // 주소 검색 서비스
     let geocoder;
 
     // 현재 위치
@@ -484,6 +492,24 @@
     const activityCategories = [
       "CT1",
       "AT4"
+    ];
+
+    // 음식 아이콘
+    const foodMarkerList = [
+      "🍰",
+      "🧁",
+      "🍓",
+      "☕",
+      "🍒"
+    ];
+
+    // 체험 아이콘
+    const activityMarkerList = [
+      "🎠",
+      "🎡",
+      "🎨",
+      "🎬",
+      "💖"
     ];
 
     // 카카오맵 로드
@@ -551,6 +577,7 @@
                 position: currentPosition
               });
 
+            // 현재 위치 안내
             const infoWindow =
               new kakao.maps.InfoWindow({
 
@@ -641,6 +668,7 @@
           );
 
           clearResults();
+
         }
       );
 
@@ -659,6 +687,7 @@
           );
 
           clearResults();
+
         }
       );
     }
@@ -717,12 +746,14 @@
                   currentPosition
                 );
 
+                // 기존 위치 마커 제거
                 if (currentMarker) {
                   currentMarker.setMap(
                     null
                   );
                 }
 
+                // 새 위치 마커
                 currentMarker =
                   new kakao.maps.Marker({
                     map: map,
@@ -730,6 +761,7 @@
                       currentPosition
                   });
 
+                // 팝업 닫기
                 document.getElementById(
                   "locationPopup"
                 ).style.display = "none";
@@ -743,6 +775,7 @@
                 alert(
                   "지역을 찾을 수 없습니다 😢"
                 );
+
               }
 
             }
@@ -801,6 +834,7 @@
                 displayPlaces(
                   allResults
                 );
+
               }
 
             },
@@ -817,7 +851,7 @@
       );
     }
 
-    // 결과 출력
+    // 검색 결과 출력
     function displayPlaces(places) {
 
       const resultList =
@@ -840,23 +874,45 @@
             place.x
           );
 
-        // 마커 이모지
+        // 랜덤 아이콘 선택
         const markerEmoji =
           currentTab === "food"
-            ? "🥄"
-            : "🏋️";
+            ? foodMarkerList[
+                Math.floor(
+                  Math.random() *
+                  foodMarkerList.length
+                )
+              ]
+            : activityMarkerList[
+                Math.floor(
+                  Math.random() *
+                  activityMarkerList.length
+                )
+              ];
 
         // 커스텀 마커
         const markerContent = `
           <div style="
-            font-size:30px;
+            width:48px;
+            height:48px;
+            border-radius:50%;
+            background:
+              linear-gradient(
+                135deg,
+                #ff9fbc,
+                #ffd1dc
+              );
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:24px;
+            border:3px solid white;
+            box-shadow:
+              0 8px 18px
+              rgba(255,105,180,0.28);
             transform:
               translate(-50%, -100%);
-            filter:
-              drop-shadow(
-                0 4px 8px
-                rgba(255,105,180,0.3)
-              );
+            backdrop-filter:blur(4px);
           ">
             ${markerEmoji}
           </div>
@@ -901,7 +957,7 @@
           </div>
         `;
 
-        // 카드 클릭
+        // 카드 클릭 이벤트
         item.addEventListener(
           "click",
           () => {
@@ -942,6 +998,7 @@
 
       });
 
+      // 결과 없을 경우
       if (places.length === 0) {
 
         resultList.innerHTML = `
@@ -957,6 +1014,7 @@
         return;
       }
 
+      // 지도 범위 조정
       map.setBounds(bounds);
 
     }
